@@ -55,6 +55,8 @@ function getMealList() {
       }
       mealList.innerHTML = html;
     });
+
+  document.querySelector(".search-control").value = "";
 }
 
 function getMealRecipe(e) {
