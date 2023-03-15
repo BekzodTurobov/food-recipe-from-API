@@ -5,6 +5,7 @@ const recipeCloseBtn = document.getElementById("recipe-close-btn");
 
 // EVENT LISTENERS
 searchBtn.addEventListener("click", getMealList);
+
 mealList.addEventListener("click", getMealRecipe);
 recipeCloseBtn.addEventListener("click", () =>
   mealDetailsContent.parentElement.classList.remove("showRecipe")
@@ -25,28 +26,50 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-// FUNCTIONS
+// LOAD SPINNER
+const loader = document.createElement("div");
+
+function showSpinner() {
+  loader.className = "loader";
+  document.body.append(loader);
+}
+
+function hideSpinner() {
+  loader.remove();
+}
+
+showSpinner();
+window.addEventListener("load", () => {
+  hideSpinner();
+});
+
+// MAIN FUNCTION (FETCH API)
+
 function getMealList() {
   let searchInputTxt = document.querySelector(".search-control").value.trim();
 
+  showSpinner();
   fetch(
     `https://www.themealdb.com/api/json/v1/1/filter.php?i=${searchInputTxt}`
   )
     .then((response) => response.json())
     .then((data) => {
       let html = "";
+      hideSpinner();
 
       if (data.meals) {
         data.meals.forEach((meal) => {
-          html += ` <div class = "meal-item" data-id='${meal.idMeal}'>
-          <div class = "meal-img">
-            <img src = "${meal.strMealThumb}" alt = "food">
-          </div>
-          <div class = "meal-name">
-            <h3>${meal.strMeal}</h3>
-            <a href = "#" class = "recipe-btn">Get Recipe</a>
-          </div>
-        </div>`;
+          html += ` 
+          <div class = "meal-item" data-id='${meal.idMeal}'>
+            <div class = "meal-img">
+              <img src = "${meal.strMealThumb}" alt = "food">
+            </div>
+            <div class = "meal-name">
+              <h3>${meal.strMeal}</h3>
+              <a href = "#" class = "recipe-btn">Get Recipe</a>
+            </div>
+
+          </div>`;
         });
         mealList.classList.remove("notFound");
       } else {
@@ -65,17 +88,20 @@ function getMealRecipe(e) {
   if (e.target.classList.contains("recipe-btn")) {
     let mealItem = e.target.parentElement.parentElement;
 
+    showSpinner();
     fetch(
       `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealItem.dataset.id}`
     )
       .then((response) => response.json())
-      .then((data) => mealRecipeModal(data.meals));
+      .then((data) => {
+        mealRecipeModal(data.meals);
+      });
   }
 }
 
 function mealRecipeModal(meal) {
   meal = meal[0];
-
+  hideSpinner();
   let html = `<h2 class = "recipe-title">${meal.strMeal}</h2>
   <p class = "recipe-category">${meal.strCategory}</p>
   <div class = "recipe-instruct">
