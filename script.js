@@ -30,20 +30,31 @@ document.addEventListener("keydown", function (e) {
 const loader = document.createElement("div");
 
 function showSpinner() {
-  loader.className = "loader";
-  document.body.append(loader);
+  loader.innerHTML = `<div class="loader"><div></div><div></div><div></div><div></div></div>`;
+
+  document.body.insertAdjacentHTML("afterbegin", loader.innerHTML);
 }
 
 function hideSpinner() {
-  loader.remove();
+  document.body.firstElementChild.remove();
 }
+// OR 👇 (inlude CSS part)
+
+// function showSpinner() {
+//   loader.className = "loader";
+//   document.body.append(loader);
+// }
+
+// function hideSpinner() {
+//   loader.remove();
+// }
 
 showSpinner();
 window.addEventListener("load", () => {
   hideSpinner();
 });
-
-// MAIN FUNCTION (FETCH API)
+// ////////////////////////////////////////
+// MAIN FUNCTIONS (FETCH API)
 
 function getMealList() {
   let searchInputTxt = document.querySelector(".search-control").value.trim();

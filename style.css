@@ -301,34 +301,65 @@ body {
   }
 }
 
-/* ///// */
+.loader {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(240, 240, 240, 0.9);
+}
+.loader div {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border: 8px solid #d65108;
+  border-radius: 50%;
+  animation: loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #d65108 transparent transparent transparent;
+}
+.loader div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.loader div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.loader div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+@keyframes loading {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
+/* OR 👇 (include JS part too) */
+/* 
 .loader {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(240, 240, 240, 0.9);
   transition: opacity 0.75s, visibility 0.75s;
-  z-index: 9999999;
 }
 
 .loader::after {
   content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 50px;
   height: 50px;
   border: 10px solid #dddddd;
   border-top-color: #d65108;
   border-radius: 50%;
-  animation: loading 0.75s ease infinite;
+  animation: loading 1s ease infinite;
 }
 
 @keyframes loading {
@@ -338,21 +369,4 @@ body {
   to {
     transform: rotate(1turn);
   }
-}
-
-/* ///// */
-
-/* #app{
-    display: grig;
-    align-items: center;
-    gap: 40px;
-
 } */
-
-#loader2 {
-  display: none;
-}
-
-#loader.show {
-  display: block;
-}
