@@ -7,9 +7,11 @@ const recipeCloseBtn = document.getElementById("recipe-close-btn");
 searchBtn.addEventListener("click", getMealList);
 
 mealList.addEventListener("click", getMealRecipe);
+
 recipeCloseBtn.addEventListener("click", () =>
   mealDetailsContent.parentElement.classList.remove("showRecipe")
 );
+
 document.addEventListener("keydown", function (e) {
   if (
     e.key === "Enter" &&
@@ -38,21 +40,21 @@ function showSpinner() {
 function hideSpinner() {
   document.body.firstElementChild.remove();
 }
-// OR 👇 (inlude CSS part)
+// OR👇 (PS:inlude CSS part)
 
 // function showSpinner() {
 //   loader.className = "loader";
-//   document.body.append(loader);
+//   document.body.prepend(loader);
 // }
 
 // function hideSpinner() {
 //   loader.remove();
 // }
 
-showSpinner();
-window.addEventListener("load", () => {
-  hideSpinner();
-});
+// showSpinner();
+// window.addEventListener("load", () => {
+//   hideSpinner();
+// });
 // ////////////////////////////////////////
 // MAIN FUNCTIONS (FETCH API)
 
@@ -130,3 +132,100 @@ function mealRecipeModal(meal) {
   mealDetailsContent.innerHTML = html;
   mealDetailsContent.parentElement.classList.add("showRecipe");
 }
+
+// //////////////////////////
+// SELECT BOX
+const selected = document.querySelector(".selected");
+const selectCategory = document.querySelector(".select-category");
+const downBtn = document.querySelector(".down-icon");
+const optionsContainer = document.querySelector(".options-container");
+const optionsList = document.querySelectorAll(".option");
+
+function openSelectOption(e) {
+  if (e.target.closest(".select-category")) {
+    optionsContainer.classList.toggle("active");
+    downBtn.classList.toggle("up");
+  } else if (!e.target.closest(".select-category")) {
+    optionsContainer.classList.remove("active");
+    downBtn.classList.remove("up");
+  }
+}
+
+optionsList.forEach((o) => {
+  o.addEventListener("click", () => {
+    selected.innerHTML = o.querySelector("label").innerHTML;
+    optionsContainer.classList.remove("active");
+    downBtn.classList.remove("up");
+  });
+});
+
+document.addEventListener("click", openSelectOption);
+
+// ////////////////////////////////////////
+// OPEN CATEGORY LIST
+
+const openCategoryList = async function () {
+  showSpinner();
+
+  fetch(`https://www.themealdb.com/api/json/v1/1/categories.php`)
+    .then((res) => res.json())
+    .then((data) => {
+      hideSpinner();
+
+      let html = "";
+      if (data.categories) {
+        data.categories.forEach((category) => {
+          html += ` <div class="option">
+          <div class="category" data-id="${category.strCategory}">${category.strCategory}</div>
+          </div> `;
+        });
+        //
+      }
+      optionsContainer.innerHTML = html;
+    });
+};
+
+selectCategory.addEventListener("click", openCategoryList);
+
+// ////////////////////////////////////////
+// SELECT THE CATEGORY
+
+function selectFoodCategory(e) {
+  const foodCategory = e.target.dataset.id;
+
+  if (e.target.classList.contains("category")) {
+    showSpinner();
+
+    fetch(
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${foodCategory}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        hideSpinner();
+        let html = "";
+
+        if (data.meals) {
+          data.meals.forEach((meal) => {
+            html += ` 
+            <div class = "meal-item" data-id='${meal.idMeal}'>
+              <div class = "meal-img">
+                <img src = "${meal.strMealThumb}" alt = "food">
+              </div>
+              <div class = "meal-name">
+                <h3>${meal.strMeal}</h3>
+                <a href = "#" class = "recipe-btn">Get Recipe</a>
+              </div>
+  
+            </div>`;
+          });
+          mealList.classList.remove("notFound");
+        } else {
+          mealList.innerHTML = `Sorry we can\'t find the meal.`;
+          mealList.classList.add("notFound");
+        }
+        mealList.innerHTML = html;
+      });
+  }
+}
+
+optionsContainer.addEventListener("click", selectFoodCategory);

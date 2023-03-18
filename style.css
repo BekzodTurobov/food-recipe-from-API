@@ -14,6 +14,7 @@ body {
   font-size: 1.05rem;
   line-height: 1.6;
   font-family: "Poppins", sans-serif;
+  /* overflow-y: hidden; */
 }
 
 /*  */
@@ -337,8 +338,8 @@ body {
   }
 }
 
-/* OR 👇 (include JS part too) */
-/* 
+/* OR 👇 (PS:include JS part too) */
+/*
 .loader {
   position: fixed;
   top: 0;
@@ -370,3 +371,104 @@ body {
     transform: rotate(1turn);
   }
 } */
+/* /////////////////////////////////////// */
+/* SELECT BOX */
+
+.categories {
+  width: 540px;
+  margin-inline: auto;
+}
+
+.select-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1rem;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.select-box .options-container {
+  color: var(--tenne-tawny);
+  border: 1px solid var(--tenne-tawny);
+  max-height: 0;
+  width: 100%;
+  opacity: 0;
+  transition: all 0.4s;
+  border-radius: 6px;
+  overflow: hidden;
+
+  order: 1;
+}
+
+.select-category {
+  display: flex;
+  align-items: stretch;
+  text-align: left;
+}
+
+.selected {
+  width: 100%;
+  border: 1px solid var(--tenne-tawny);
+  color: var(--tenne-tawny);
+  border-top-left-radius: 2rem;
+  border-bottom-left-radius: 2rem;
+  border: 1px solid var(--tenne-tawny);
+  margin-bottom: 8px;
+  color: var(--tenne-tawny);
+
+  order: 0;
+}
+.down-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  width: 55px;
+  height: 55px;
+  color: #fff;
+  background: var(--tenne-tawny);
+  border-top-right-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  transition: all 0.4s linear;
+  -webkit-transition: all 0.4s linear;
+}
+
+.down-icon {
+  transition: all 0.4s;
+}
+
+.down-icon.up {
+  transform: rotateX(180deg);
+  top: -6px;
+}
+
+.select-box .options-container.active {
+  max-height: 240px;
+  opacity: 1;
+  overflow-y: scroll;
+}
+
+.select-box .options-container::-webkit-scrollbar {
+  width: 8px;
+  height: 40px;
+  background: #cbced3;
+  border-radius: 4px;
+  min-height: 30px;
+}
+
+.select-box .options-container::-webkit-scrollbar-thumb {
+  background: var(--tenne-tawny);
+  border-radius: 8px;
+  min-height: 30px;
+}
+
+.select-box .option,
+.selected {
+  padding: 12px 24px;
+  cursor: pointer;
+}
+
+.select-box .option:hover {
+  background: #cbced3;
+}
