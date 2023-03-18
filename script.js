@@ -3,14 +3,24 @@ const mealList = document.getElementById("meal");
 const mealDetailsContent = document.querySelector(".meal-details-content");
 const recipeCloseBtn = document.getElementById("recipe-close-btn");
 
+const selected = document.querySelector(".selected");
+const selectCategory = document.querySelector(".select-category");
+const downBtn = document.querySelector(".down-icon");
+const optionsContainer = document.querySelector(".options-container");
+const optionsList = document.querySelectorAll(".option");
+
 // EVENT LISTENERS
 searchBtn.addEventListener("click", getMealList);
-
 mealList.addEventListener("click", getMealRecipe);
+selectCategory.addEventListener("click", openCategoryList);
+optionsContainer.addEventListener("click", selectFoodCategory);
+document.addEventListener("click", openSelectOption);
 
 recipeCloseBtn.addEventListener("click", () =>
   mealDetailsContent.parentElement.classList.remove("showRecipe")
 );
+// ////////////////////////////////////
+// HANDLE KEYDOWN
 
 document.addEventListener("keydown", function (e) {
   if (
@@ -27,7 +37,7 @@ document.addEventListener("keydown", function (e) {
     mealDetailsContent.parentElement.classList.remove("showRecipe");
   }
 });
-
+// /////////////////////////////////////////
 // LOAD SPINNER
 const loader = document.createElement("div");
 
@@ -58,6 +68,8 @@ function hideSpinner() {
 // ////////////////////////////////////////
 // MAIN FUNCTIONS (FETCH API)
 
+// ///////////////////////////////////////
+// GET MEAL LIST
 function getMealList() {
   let searchInputTxt = document.querySelector(".search-control").value.trim();
 
@@ -67,34 +79,16 @@ function getMealList() {
   )
     .then((response) => response.json())
     .then((data) => {
-      let html = "";
+      renderList(data);
       hideSpinner();
-
-      if (data.meals) {
-        data.meals.forEach((meal) => {
-          html += ` 
-          <div class = "meal-item" data-id='${meal.idMeal}'>
-            <div class = "meal-img">
-              <img src = "${meal.strMealThumb}" alt = "food">
-            </div>
-            <div class = "meal-name">
-              <h3>${meal.strMeal}</h3>
-              <a href = "#" class = "recipe-btn">Get Recipe</a>
-            </div>
-
-          </div>`;
-        });
-        mealList.classList.remove("notFound");
-      } else {
-        mealList.innerHTML = `Sorry we can\'t find the meal.`;
-        mealList.classList.add("notFound");
-      }
-      mealList.innerHTML = html;
     });
 
+  selected.innerHTML = "Select food category";
   document.querySelector(".search-control").value = "";
 }
 
+// ///////////////////////////////////////
+// GET MEAL RECIPE
 function getMealRecipe(e) {
   e.preventDefault();
 
@@ -108,13 +102,15 @@ function getMealRecipe(e) {
       .then((response) => response.json())
       .then((data) => {
         mealRecipeModal(data.meals);
+        hideSpinner();
       });
   }
 }
 
+// ///////////////////////////////////////
+// MEAL RECIPE MODAL
 function mealRecipeModal(meal) {
   meal = meal[0];
-  hideSpinner();
   let html = `<h2 class = "recipe-title">${meal.strMeal}</h2>
   <p class = "recipe-category">${meal.strCategory}</p>
   <div class = "recipe-instruct">
@@ -133,13 +129,82 @@ function mealRecipeModal(meal) {
   mealDetailsContent.parentElement.classList.add("showRecipe");
 }
 
-// //////////////////////////
-// SELECT BOX
-const selected = document.querySelector(".selected");
-const selectCategory = document.querySelector(".select-category");
-const downBtn = document.querySelector(".down-icon");
-const optionsContainer = document.querySelector(".options-container");
-const optionsList = document.querySelectorAll(".option");
+// ////////////////////////////////////////
+// OPEN CATEGORY LIST
+
+function openCategoryList() {
+  // showSpinner();
+
+  fetch(`https://www.themealdb.com/api/json/v1/1/categories.php`)
+    .then((res) => res.json())
+    .then((data) => {
+      // hideSpinner();
+
+      let html = "";
+      if (data.categories) {
+        data.categories.forEach((category) => {
+          html += ` <div class="option">
+          <div class="category" data-id="${category.strCategory}">${category.strCategory}</div>
+          </div> `;
+        });
+        //
+      }
+      optionsContainer.innerHTML = html;
+    });
+}
+
+// ////////////////////////////////////////
+// SELECT THE CATEGORY
+
+function selectFoodCategory(e) {
+  const foodCategory = e.target.dataset.id;
+
+  if (e.target.classList.contains("category")) {
+    showSpinner();
+
+    fetch(
+      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${foodCategory}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        renderList(data);
+        hideSpinner();
+      });
+
+    selected.innerHTML = foodCategory;
+  }
+}
+
+// ///////////////////////////////////////
+// RENDER FOOD LIST
+function renderList(data) {
+  let html = "";
+
+  if (data.meals) {
+    data.meals.forEach((meal) => {
+      html += ` 
+      <div class = "meal-item" data-id='${meal.idMeal}'>
+        <div class = "meal-img">
+          <img src = "${meal.strMealThumb}" alt = "food">
+        </div>
+        <div class = "meal-name">
+          <h3>${meal.strMeal}</h3>
+          <a href = "#" class = "recipe-btn">Get Recipe</a>
+        </div>
+
+      </div>`;
+    });
+    mealList.classList.remove("notFound");
+  } else {
+    mealList.innerHTML = `Sorry we can\'t find the meal.`;
+    mealList.classList.add("notFound");
+  }
+
+  mealList.innerHTML = html;
+}
+
+// ////////////////////////////////////
+// OPEN SELECT BOX
 
 function openSelectOption(e) {
   if (e.target.closest(".select-category")) {
@@ -158,74 +223,3 @@ optionsList.forEach((o) => {
     downBtn.classList.remove("up");
   });
 });
-
-document.addEventListener("click", openSelectOption);
-
-// ////////////////////////////////////////
-// OPEN CATEGORY LIST
-
-const openCategoryList = async function () {
-  showSpinner();
-
-  fetch(`https://www.themealdb.com/api/json/v1/1/categories.php`)
-    .then((res) => res.json())
-    .then((data) => {
-      hideSpinner();
-
-      let html = "";
-      if (data.categories) {
-        data.categories.forEach((category) => {
-          html += ` <div class="option">
-          <div class="category" data-id="${category.strCategory}">${category.strCategory}</div>
-          </div> `;
-        });
-        //
-      }
-      optionsContainer.innerHTML = html;
-    });
-};
-
-selectCategory.addEventListener("click", openCategoryList);
-
-// ////////////////////////////////////////
-// SELECT THE CATEGORY
-
-function selectFoodCategory(e) {
-  const foodCategory = e.target.dataset.id;
-
-  if (e.target.classList.contains("category")) {
-    showSpinner();
-
-    fetch(
-      `https://www.themealdb.com/api/json/v1/1/filter.php?c=${foodCategory}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        hideSpinner();
-        let html = "";
-
-        if (data.meals) {
-          data.meals.forEach((meal) => {
-            html += ` 
-            <div class = "meal-item" data-id='${meal.idMeal}'>
-              <div class = "meal-img">
-                <img src = "${meal.strMealThumb}" alt = "food">
-              </div>
-              <div class = "meal-name">
-                <h3>${meal.strMeal}</h3>
-                <a href = "#" class = "recipe-btn">Get Recipe</a>
-              </div>
-  
-            </div>`;
-          });
-          mealList.classList.remove("notFound");
-        } else {
-          mealList.innerHTML = `Sorry we can\'t find the meal.`;
-          mealList.classList.add("notFound");
-        }
-        mealList.innerHTML = html;
-      });
-  }
-}
-
-optionsContainer.addEventListener("click", selectFoodCategory);

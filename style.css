@@ -409,6 +409,7 @@ body {
 
 .selected {
   width: 100%;
+  height: 55px;
   border: 1px solid var(--tenne-tawny);
   color: var(--tenne-tawny);
   border-top-left-radius: 2rem;
